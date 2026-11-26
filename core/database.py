@@ -125,3 +125,18 @@ class CivicDatabase:
                 item["grounded"] = bool(item["grounded"])
                 results.append(item)
             return results
+    def document_exists_by_hash(self, file_hash: str) -> Optional[str]:
+        """Return the filename if an identical SHA-256 PDF is already registered."""
+        with self._connect() as conn:
+            row = conn.execute(
+                "SELECT filename FROM documents WHERE file_hash = ?", (file_hash,)
+            ).fetchone()
+            return str(row["filename"]) if row else None
+
+    def delete_document(self, filename: str) -> None:
+        """Remove a document record from the SQLite registry."""
+        try:
+            with self._connect() as conn:
+                conn.execute("DELETE FROM documents WHERE filename = ?", (filename,))
+        except sqlite3.Error as exc:
+            raise StorageError(f"Failed to delete document record: {exc}") from exc
