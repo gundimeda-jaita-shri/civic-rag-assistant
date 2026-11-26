@@ -1,5 +1,21 @@
-venv/
+# Environments & Secrets
 .env
+.venv/
+venv/
+env/
+
+# Python cache & build artifacts
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
+.pytest_cache/
+.ruff_cache/
+
+# Local SQLite database, FAISS index & uploaded PDFs
+data/
+
+# IDE & OS files
+.vscode/
+.idea/
 .DS_Store
+Thumbs.db
