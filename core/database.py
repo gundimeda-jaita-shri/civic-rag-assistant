@@ -140,3 +140,37 @@ class CivicDatabase:
                 conn.execute("DELETE FROM documents WHERE filename = ?", (filename,))
         except sqlite3.Error as exc:
             raise StorageError(f"Failed to delete document record: {exc}") from exc
+
+    def get_registry_stats(self) -> Dict[str, Any]:
+        """Compute aggregate counts and latency telemetry for the dashboard."""
+        with self._connect() as conn:
+            doc_row = conn.execute(
+                """
+                SELECT
+                    COUNT(*) AS doc_count,
+                    COALESCE(SUM(page_count), 0) AS total_pages,
+                    COALESCE(SUM(chunk_count), 0) AS total_chunks,
+                    COALESCE(SUM(table_count), 0) AS total_tables
+                FROM documents
+                """
+            ).fetchone()
+
+            query_row = conn.execute(
+                """
+                SELECT
+                    COUNT(*) AS total_queries,
+                    COALESCE(SUM(grounded), 0) AS grounded_queries,
+                    COALESCE(ROUND(AVG(latency_ms)), 0) AS avg_latency_ms
+                FROM query_logs
+                """
+            ).fetchone()
+
+            return {
+                "doc_count": int(doc_row["doc_count"]),
+                "total_pages": int(doc_row["total_pages"]),
+                "total_chunks": int(doc_row["total_chunks"]),
+                "total_tables": int(doc_row["total_tables"]),
+                "total_queries": int(query_row["total_queries"]),
+                "grounded_queries": int(query_row["grounded_queries"]),
+                "avg_latency_ms": int(query_row["avg_latency_ms"]),
+            }
