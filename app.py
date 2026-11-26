@@ -18,6 +18,7 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
+
 UI_STRINGS = {
     "English": {
         "ministry": "Government of India • Digital Citizen Information Service",
@@ -165,7 +166,7 @@ UI_STRINGS = {
     }
 }
 
-# 2. Permanent Local Emblem Loader (Supports .in-, .in-*, .png, .jpg, .webp, .svg)
+# 2. Permanent Local Emblem Loader (Supports .in_, .in_*, .png, .jpg, .webp, .svg)
 def detect_mime_type(raw_bytes: bytes, filename: str) -> str:
     if raw_bytes.startswith(b"\x89PNG\r\n\x1a\n"):
         return "image/png"
@@ -184,6 +185,7 @@ def get_permanent_emblem_src() -> str:
     search_patterns = [
         os.path.join(base_dir, "*.in_*"),
         os.path.join(base_dir, "*.in_"),
+        os.path.join(base_dir, "central_govt*"),
         os.path.join(base_dir, "india_emblem*"),
         os.path.join(base_dir, "emblem*"),
         os.path.join(base_dir, "assets", "*.in_*"),
@@ -201,7 +203,6 @@ def get_permanent_emblem_src() -> str:
                     b64_encoded = base64.b64encode(raw_bytes).decode("utf-8")
                     return f"data:{mime_type};base64,{b64_encoded}"
 
-    # Formal inline SVG fallback so the header never breaks even if the file is moved
     fallback_svg = """
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
         <rect width="120" height="120" rx="8" fill="#FFFFFF"/>
@@ -213,7 +214,7 @@ def get_permanent_emblem_src() -> str:
     b64_svg = base64.b64encode(fallback_svg.encode("utf-8")).decode("utf-8")
     return f"data:image/svg+xml;base64,{b64_svg}"
 
-# 3. Initialize Session State
+# 3. Initialize Session State (Including Language State for Instant UI Switching)
 if "indexed_chunks" not in st.session_state:
     st.session_state.indexed_chunks = []
 if "faiss_index" not in st.session_state:
@@ -224,6 +225,11 @@ if "doc_names" not in st.session_state:
     st.session_state.doc_names = []
 if "audit_log" not in st.session_state:
     st.session_state.audit_log = []
+if "lang_select" not in st.session_state:
+    st.session_state.lang_select = "English"
+
+response_lang = st.session_state.lang_select
+t = UI_STRINGS.get(response_lang, UI_STRINGS["English"])
 
 # 4. Load Multilingual Embedding Model (Cached)
 @st.cache_resource
@@ -232,26 +238,39 @@ def load_embedder():
 
 embedder = load_embedder()
 
-# 5. Sidebar Controls (Formal Display Settings, Document Registry & Query Controls)
+# 5. Sidebar Controls (Language Selector First, Then Localized Controls)
 with st.sidebar:
-    st.markdown("### **DISPLAY SETTINGS**")
+    st.markdown(f"### **{t['query_controls']}**")
+    st.selectbox(
+        t["resp_lang"],
+        options=list(UI_STRINGS.keys()),
+        key="lang_select"
+    )
+    response_lang = st.session_state.lang_select
+    t = UI_STRINGS.get(response_lang, UI_STRINGS["English"])
+
+    scope_options = [t["all_docs"]] + st.session_state.doc_names
+    doc_scope = st.selectbox(t["scope_filter"], options=scope_options)
+    st.markdown("---")
+
+    st.markdown(f"### **{t['display_settings']}**")
     theme_choice = st.radio(
         "Interface Theme",
-        options=["Light Theme (Default)", "Dark Theme"],
+        options=[t["light_theme"], t["dark_theme"]],
         index=0,
         label_visibility="collapsed"
     )
     st.markdown("---")
 
-    st.markdown("### **CIVIC DOCUMENT REGISTRY**")
+    st.markdown(f"### **{t['doc_registry']}**")
     uploaded_files = st.file_uploader(
-        "Upload Official Scheme PDFs",
+        t["upload_label"],
         type=["pdf"],
         accept_multiple_files=True
     )
 
     if uploaded_files:
-        if st.button("INDEX UPLOADED DOCUMENTS", use_container_width=True):
+        if st.button(t["index_btn"], use_container_width=True):
             with st.spinner("Processing and indexing official documents..."):
                 splitter = RecursiveCharacterTextSplitter(chunk_size=800, chunk_overlap=150)
                 all_chunks = []
@@ -278,7 +297,7 @@ with st.sidebar:
                     index = faiss.IndexFlatIP(embeddings.shape[1])
                     index.add(embeddings)
 
-                    tokenized_corpus = [t.lower().split() for t in texts]
+                    tokenized_corpus = [txt.lower().split() for txt in texts]
                     bm25 = BM25Okapi(tokenized_corpus)
 
                     st.session_state.indexed_chunks = all_chunks
@@ -287,18 +306,8 @@ with st.sidebar:
                     st.session_state.doc_names = doc_list
                     st.success(f"Indexed {len(all_chunks)} sections across {len(doc_list)} document(s).")
 
-    st.markdown("---")
-    st.markdown("### **QUERY CONTROLS**")
-    response_lang = st.selectbox(
-        "Response Language",
-        options=["English", "Hindi", "Telugu", "Tamil", "Marathi", "Bengali"]
-    )
-
-    scope_options = ["All Indexed Documents"] + st.session_state.doc_names
-    doc_scope = st.selectbox("Document Scope Filter", options=scope_options)
-
 # 6. Dynamic Formal Government Color Palette
-is_dark = (theme_choice == "Dark Theme")
+is_dark = (theme_choice == t["dark_theme"])
 
 if is_dark:
     bg_main = "#0F172A"          # Muted Deep Slate
@@ -342,8 +351,8 @@ st.markdown(f"""
         font-weight: 800 !important;
         letter-spacing: -0.01em;
     }}
-    .stApp p, .stApp label, .stApp span, .stApp div {{
-        color: {text_main};
+    .stApp p, .stApp label, .stApp li {{
+        color: {text_main} !important;
     }}
     textarea, input, [data-baseweb="select"] > div {{
         background-color: {bg_card} !important;
@@ -368,6 +377,7 @@ st.markdown(f"""
         font-weight: 800 !important;
         font-size: 14px !important;
         letter-spacing: 0.03em;
+        color: {text_main} !important;
     }}
     .central-govt-banner {{
         display: flex;
@@ -410,35 +420,27 @@ st.markdown(f"""
         margin: 0;
         color: {text_secondary} !important;
     }}
-    .citation-box {{
-        background-color: {bg_card};
-        border: 1px solid {border_col};
-        border-left: 4px solid {navy_accent};
-        padding: 14px 18px;
-        border-radius: 4px;
-        margin-top: 12px;
-    }}
 </style>
 
 <div class="central-govt-banner">
     <img src="{emblem_src}" alt="National Emblem of India" />
     <div class="central-govt-text">
-        <div class="ministry-tag">Government of India &bull; Digital Citizen Information Service</div>
-        <h1>Multilingual Civic Scheme &amp; Document Assistant</h1>
-        <p>Citation-grounded public policy &amp; welfare scheme verification portal powered by Hybrid Retrieval (FAISS + BM25) and Gemini.</p>
+        <div class="ministry-tag">{t['ministry']}</div>
+        <h1>{t['title']}</h1>
+        <p>{t['subtitle']}</p>
     </div>
 </div>
 """, unsafe_allow_html=True)
 
 # 8. Hybrid Retrieval & Gemini Answer Generation Function
-def retrieve_and_answer(query: str, lang: str, scope: str):
+def retrieve_and_answer(query: str, lang: str, scope: str, all_docs_label: str):
     chunks = st.session_state.indexed_chunks
     if not chunks:
         return "No indexed documents found. Please upload and index official scheme PDFs in the left sidebar first.", []
 
     valid_indices = [
         i for i, c in enumerate(chunks)
-        if scope == "All Indexed Documents" or c["source"] == scope
+        if scope == all_docs_label or c["source"] == scope
     ]
     if not valid_indices:
         return "No sections match the selected document scope.", []
@@ -480,44 +482,54 @@ VERIFIED EXCERPTS:
 CITIZEN QUESTION:
 {query}
 """
-    api_key = os.environ.get("GEMINI_API_KEY") or st.secrets.get("GEMINI_API_KEY", "")
+    api_key = os.environ.get("GEMINI_API_KEY", "")
+    if not api_key:
+        try:
+            api_key = st.secrets.get("GEMINI_API_KEY", "")
+        except Exception:
+            api_key = ""
+
     if not api_key:
         return "API key missing. Set GEMINI_API_KEY in environment variables or Streamlit secrets.", top_chunks
 
-    client = genai.Client(api_key=api_key)
-    response = client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=prompt,
-        config=types.GenerateContentConfig(
-            temperature=0.1,
-            max_output_tokens=900,
-        ),
-    )
-    return response.text, top_chunks
+    try:
+        client = genai.Client(api_key=api_key)
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=prompt,
+            config=types.GenerateContentConfig(
+                temperature=0.1,
+                max_output_tokens=900,
+            ),
+        )
+        return response.text or "Model returned an empty response.", top_chunks
+    except Exception as e:
+        return f"Gemini API Error: {str(e)}", top_chunks
 
-# 9. Formal Tabs (No Emojis, Bold Uppercase)
-tab_ask, tab_audit = st.tabs(["ASK AND VERIFY", "QUERY AUDIT LOG"])
+# 9. Formal Tabs (Localized, No Emojis, Bold Uppercase)
+tab_ask, tab_audit = st.tabs([t["tab_ask"], t["tab_audit"]])
 
 with tab_ask:
-    st.markdown("**Enter your question about eligibility, benefits, required documents, or deadlines:**")
+    st.markdown(f"**{t['prompt_label']}**")
     user_query = st.text_area(
         "Citizen Query Input",
-        placeholder="e.g., What is the annual financial assistance provided under the scheme, and what are the eligibility criteria?",
+        placeholder=t["placeholder"],
         height=115,
         label_visibility="collapsed"
     )
 
-    if st.button("GENERATE VERIFIED ANSWER"):
+    if st.button(t["gen_btn"]):
         if not user_query.strip():
             st.warning("Please enter a valid question before submitting.")
         else:
             with st.spinner("Retrieving official citations and verifying response..."):
-                answer, sources = retrieve_and_answer(user_query.strip(), response_lang, doc_scope)
-                st.markdown("### **VERIFIED RESPONSE**")
-                st.markdown(f"<div class='citation-box'>{answer}</div>", unsafe_allow_html=True)
+                answer, sources = retrieve_and_answer(user_query.strip(), response_lang, doc_scope, t["all_docs"])
+                st.markdown(f"### **{t['verified_resp']}**")
+                with st.container(border=True):
+                    st.markdown(answer)
 
                 if sources:
-                    st.markdown("### **SUPPORTING DOCUMENT CITATIONS**")
+                    st.markdown(f"### **{t['citations']}**")
                     for idx, src in enumerate(sources, 1):
                         with st.expander(f"Citation {idx}: {src['source']} — Page {src['page']}"):
                             st.write(src["text"])
@@ -531,12 +543,13 @@ with tab_ask:
                 })
 
 with tab_audit:
-    st.markdown("### **SESSION QUERY AUDIT LOG**")
+    st.markdown(f"### **{t['audit_title']}**")
     if not st.session_state.audit_log:
-        st.info("No queries have been submitted in this session yet.")
+        st.info(t["no_queries"])
     else:
         for entry in st.session_state.audit_log:
             with st.expander(f"[{entry['timestamp']}] ({entry['language']}) — {entry['question'][:80]}"):
-                st.markdown(f"**Document Scope:** {entry['scope']}")
+                st.markdown(f"**{t['scope_filter']}:** {entry['scope']}")
                 st.markdown(f"**Question:** {entry['question']}")
-                st.markdown(f"**Verified Answer:**\n\n{entry['answer']}")
+                st.markdown(f"**{t['verified_resp']}:**")
+                st.markdown(entry["answer"])
