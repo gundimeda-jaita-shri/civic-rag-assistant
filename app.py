@@ -23,7 +23,6 @@ UI_STRINGS = {
     "English": {
         "ministry": "Government of India • Digital Citizen Information Service",
         "title": "Multilingual Civic Scheme & Document Assistant",
-        "subtitle": "Citation-grounded public policy & welfare scheme verification portal powered by Hybrid Retrieval (FAISS + BM25) and Gemini.",
         "display_settings": "DISPLAY SETTINGS",
         "light_theme": "Light Theme (Default)",
         "dark_theme": "Dark Theme",
@@ -47,7 +46,6 @@ UI_STRINGS = {
     "Hindi": {
         "ministry": "भारत सरकार • डिजिटल नागरिक सूचना सेवा",
         "title": "बहुभाषी नागरिक योजना एवं दस्तावेज़ सहायक",
-        "subtitle": "हाइब्रिड रिट्रीवल (FAISS + BM25) और जेमिनी द्वारा संचालित प्रमाण-आधारित सार्वजनिक नीति एवं कल्याण योजना सत्यापन पोर्टल।",
         "display_settings": "प्रदर्शन सेटिंग्स",
         "light_theme": "लाइट थीम (डिफ़ॉल्ट)",
         "dark_theme": "डार्क थीम",
@@ -71,7 +69,6 @@ UI_STRINGS = {
     "Telugu": {
         "ministry": "భారత ప్రభుత్వం • డిజిటల్ పౌర సమాచార సేవ",
         "title": "బహుభాషా పౌర పథకం & పత్రాల సహాయకుడు",
-        "subtitle": "హైబ్రిడ్ రిట్రీవల్ (FAISS + BM25) మరియు జెమిని ద్వారా ఆధారితమైన ప్రజా విధాన & సంక్షేమ పథకాల ధృవీకరణ పోర్టల్.",
         "display_settings": "డిస్‌ప్లే సెట్టింగ్‌లు",
         "light_theme": "లైట్ థీమ్ (డిఫాల్ట్)",
         "dark_theme": "డార్క్ థీమ్",
@@ -95,7 +92,6 @@ UI_STRINGS = {
     "Tamil": {
         "ministry": "இந்திய அரசு • டிஜிட்டல் குடிமக்கள் தகவல் சேவை",
         "title": "பன்மொழி குடிமக்கள் திட்டம் & ஆவண உதவியாளர்",
-        "subtitle": "ஹைப்ரிட் மீட்டெடுப்பு (FAISS + BM25) மற்றும் ஜெமினி மூலம் இயக்கப்படும் பொதுக் கொள்கை மற்றும் நலத்திட்ட சரிபார்ப்பு தளம்.",
         "display_settings": "காட்சி அமைப்புகள்",
         "light_theme": "ஒளி தீம் (இயல்புநிலை)",
         "dark_theme": "இருண்ட தீம்",
@@ -119,7 +115,6 @@ UI_STRINGS = {
     "Marathi": {
         "ministry": "भारत सरकार • डिजिटल नागरिक माहिती सेवा",
         "title": "बहुभाषिक नागरी योजना आणि दस्तऐवज सहाय्यक",
-        "subtitle": "हायब्रीड रिट्रीव्हल (FAISS + BM25) आणि जेमिनी द्वारे संचालित सार्वजनिक धोरण आणि कल्याणकारी योजना पडताळणी पोर्टल.",
         "display_settings": "प्रदर्शन सेटिंग्ज",
         "light_theme": "लाइट थीम (डीफॉल्ट)",
         "dark_theme": "डार्क थीम",
@@ -143,7 +138,6 @@ UI_STRINGS = {
     "Bengali": {
         "ministry": "ভারত সরকার • ডিজিটাল নাগরিক তথ্য পরিষেবা",
         "title": "বহুভাষিক নাগরিক প্রকল্প ও নথি সহায়ক",
-        "subtitle": "হাইব্রিড রিট্রিভাল (FAISS + BM25) এবং জেমিনি দ্বারা চালিত জননীতি ও কল্যাণ প্রকল্প যাচাইকরণ পোর্টাল।",
         "display_settings": "ডিসপ্লে সেটিংস",
         "light_theme": "লাইট থিম (ডিফল্ট)",
         "dark_theme": "ডার্ক থিম",
@@ -214,7 +208,7 @@ def get_permanent_emblem_src() -> str:
     b64_svg = base64.b64encode(fallback_svg.encode("utf-8")).decode("utf-8")
     return f"data:image/svg+xml;base64,{b64_svg}"
 
-# 3. Initialize Session State (Including Language State for Instant UI Switching)
+# 3. Initialize Session State
 if "indexed_chunks" not in st.session_state:
     st.session_state.indexed_chunks = []
 if "faiss_index" not in st.session_state:
@@ -238,7 +232,7 @@ def load_embedder():
 
 embedder = load_embedder()
 
-# 5. Sidebar Controls (Language Selector First, Then Localized Controls)
+# 5. Sidebar Controls
 with st.sidebar:
     st.markdown(f"### **{t['query_controls']}**")
     st.selectbox(
@@ -310,31 +304,29 @@ with st.sidebar:
 is_dark = (theme_choice == t["dark_theme"])
 
 if is_dark:
-    bg_main = "#0F172A"          # Muted Deep Slate
-    bg_sidebar = "#1E293B"       # Neutral Dark Slate
+    bg_main = "#0F172A"
+    bg_sidebar = "#1E293B"
     bg_card = "#1E293B"
-    text_main = "#F8FAFC"        # Crisp Off-White
-    text_secondary = "#CBD5E1"
+    text_main = "#F8FAFC"
     border_col = "#334155"
     header_bg = "#1E293B"
     navy_accent = "#3B82F6"
     saffron_accent = "#D97706"
     btn_bg = "#1B365D"
 else:
-    bg_main = "#FFFFFF"          # High-Contrast Official White
-    bg_sidebar = "#F3F4F6"       # Calm Light Neutral Gray
+    bg_main = "#FFFFFF"
+    bg_sidebar = "#F3F4F6"
     bg_card = "#F8FAFC"
-    text_main = "#111827"        # High-Contrast Charcoal Black
-    text_secondary = "#374151"
+    text_main = "#111827"
     border_col = "#CBD5E1"
     header_bg = "#F8FAFC"
-    navy_accent = "#1B365D"      # Official Government Ashoka Navy
-    saffron_accent = "#D97706"   # Official Saffron Gold Accent
+    navy_accent = "#1B365D"
+    saffron_accent = "#D97706"
     btn_bg = "#1B365D"
 
 emblem_src = get_permanent_emblem_src()
 
-# 7. Inject Formal CSS & Permanent Central Government Header
+# 7. Inject Formal CSS & Permanent Central Government Header (Subtitle Removed)
 st.markdown(f"""
 <style>
     .stApp, [data-testid="stHeader"] {{
@@ -411,14 +403,8 @@ st.markdown(f"""
     .central-govt-text h1 {{
         font-size: 23px !important;
         font-weight: 800 !important;
-        margin: 0 0 6px 0 !important;
+        margin: 0 !important;
         color: {text_main} !important;
-    }}
-    .central-govt-text p {{
-        font-size: 14px;
-        font-weight: 500;
-        margin: 0;
-        color: {text_secondary} !important;
     }}
 </style>
 
@@ -427,7 +413,6 @@ st.markdown(f"""
     <div class="central-govt-text">
         <div class="ministry-tag">{t['ministry']}</div>
         <h1>{t['title']}</h1>
-        <p>{t['subtitle']}</p>
     </div>
 </div>
 """, unsafe_allow_html=True)
