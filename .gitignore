@@ -19,3 +19,8 @@ data/
 .idea/
 .DS_Store
 Thumbs.db
+# Runtime database, vector indexes, and test caches
+data/
+.pytest_cache/
+__pycache__/
+*.py[cod]
