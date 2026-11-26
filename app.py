@@ -36,7 +36,7 @@ settings = get_settings()
 st.markdown(
     """
     <div class="civic-header">
-        <h1>🏛️ Multilingual Civic Scheme & Document Assistant</h1>
+        <h1> Multilingual Civic Scheme & Document Assistant</h1>
         <p>Citation-grounded public policy & welfare scheme assistant powered by Hybrid Retrieval (FAISS + BM25) and Gemini.</p>
     </div>
     """,
@@ -45,7 +45,7 @@ st.markdown(
 
 # Sidebar: Document Ingestion, Scope Filter & Telemetry
 with st.sidebar:
-    st.subheader("📄 Civic Document Registry")
+    st.subheader("Civic Document Registry")
     uploaded_files = st.file_uploader(
         "Upload Official Scheme PDFs",
         type=["pdf"],
@@ -71,7 +71,7 @@ with st.sidebar:
                 st.error(f"Failed to index {uploaded.name}: {exc}")
 
     st.divider()
-    st.subheader("⚙️ Query Controls")
+    st.subheader(" Query Controls")
     target_language = st.selectbox(
         "Response Language",
         options=SUPPORTED_LANGUAGES,
@@ -188,34 +188,19 @@ with tab_qa:
             latency_ms=outcome.latency_ms,
         )
         st.download_button(
-            label="📥 Download Verification Audit Report (.md)",
+            label=" Download Verification Audit Report (.md)",
             data=report_md,
             file_name="civic_verification_report.md",
             mime="text/markdown",
         )
 
-        with st.expander("🔎 Inspect Raw Hybrid Retrieval Evidence (FAISS + BM25)"):
+        with st.expander(" Inspect Raw Hybrid Retrieval Evidence (FAISS + BM25)"):
             for idx, chunk in enumerate(outcome.retrieved_chunks, start=1):
+                meta = chunk.document.metadata or {}
+                src = meta.get("source", "unknown")
+                pg = meta.get("page", "?")
                 st.markdown(
-                    f"**Evidence #{idx}** — `{chunk.source}` · Page `{chunk.page}` · "
-                    f"RRF Score: `{chunk.score:.4f}`"
+                    f"**Evidence #{idx}** — `{src}` · Page `{pg}` · "
+                    f"RRF Score: `{chunk.rrf_score:.4f}`"
                 )
-                st.code(chunk.content, language="text")
-
-with tab_audit:
-    st.subheader("Recent Citizen Query Audit Trail")
-    logs = service.get_recent_query_logs(limit=25)
-    if not logs:
-        st.caption("No queries logged yet.")
-    else:
-        for entry in logs:
-            status_icon = "✅" if entry["grounded"] else "⚠️"
-            with st.expander(
-                f"{status_icon} [{entry['language']}] {entry['question'][:90]} ({entry['latency_ms']} ms)"
-            ):
-                st.markdown(f"**Timestamp:** `{entry['created_at']}`")
-                st.markdown(f"**Answer:** {entry['answer']}")
-                if entry["citations"]:
-                    st.markdown("**Citations:**")
-                    for c in entry["citations"]:
-                        st.markdown(f"- `{c['source']}` (p.{c['page']}): *\"{c['quote']}\"*")
+                st.code(chunk.document.page_content, language="text")

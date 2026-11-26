@@ -24,7 +24,8 @@ def compute_recall_and_mrr(
 ) -> tuple[float, float]:
     """Compute binary Recall@K and Reciprocal Rank (MRR) for expected source + page."""
     for rank, chunk in enumerate(retrieved_chunks, start=1):
-        if chunk.source == expected_source and chunk.page == expected_page:
+        meta = chunk.document.metadata or {}
+        if meta.get("source") == expected_source and int(meta.get("page", -1)) == expected_page:
             return 1.0, 1.0 / rank
     return 0.0, 0.0
 
