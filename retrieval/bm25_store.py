@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import List, Optional, Tuple
 
 from langchain_core.documents import Document
-from rank_bm25 import BM25Okapi
+from rank_bm25 import BM25Plus
 
 from core.config import get_settings
 from core.exceptions import RetrievalError
@@ -27,14 +27,14 @@ class CivicBM25Store:
         base_dir.mkdir(parents=True, exist_ok=True)
         self.corpus_path = base_dir / "bm25_corpus.pkl"
         self._documents: List[Document] = []
-        self._bm25: Optional[BM25Okapi] = None
+        self._bm25: Optional[BM25Plus] = None
 
     def _rebuild_index(self) -> None:
         if not self._documents:
             self._bm25 = None
             return
         tokenized = [_tokenize_multilingual(doc.page_content) for doc in self._documents]
-        self._bm25 = BM25Okapi(tokenized)
+        self._bm25 = BM25Plus(tokenized)
 
     def load(self) -> bool:
         """Load persisted documents from disk and build the in-memory BM25 index."""
