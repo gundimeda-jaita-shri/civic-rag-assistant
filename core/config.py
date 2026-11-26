@@ -1,30 +1,41 @@
-import os
-from dataclasses import dataclass
+from functools import lru_cache
 from pathlib import Path
-from dotenv import load_dotenv
+from pydantic import Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
-load_dotenv()
 
+class Settings(BaseSettings):
+    """Application settings loaded from environment variables and .env."""
 
-@dataclass(frozen=True)
-class Settings:
-    google_api_key: str = os.getenv("GOOGLE_API_KEY", "")
-    gemini_model_name: str = os.getenv("GEMINI_MODEL_NAME", "gemini-2.5-flash")
-    embedding_model_name: str = os.getenv(
-        "EMBEDDING_MODEL_NAME",
-        "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        extra="ignore",
     )
-    sqlite_db_path: Path = Path(os.getenv("SQLITE_DB_PATH", "data/civic_rag.db"))
-    faiss_index_dir: Path = Path(os.getenv("FAISS_INDEX_DIR", "data/faiss_index"))
-    chunk_size: int = int(os.getenv("CHUNK_SIZE", "750"))
-    chunk_overlap: int = int(os.getenv("CHUNK_OVERLAP", "120"))
-    top_k: int = 5
-    dense_weight: float = 0.6
-    sparse_weight: float = 0.4
 
-    def ensure_directories(self) -> None:
-        self.sqlite_db_path.parent.mkdir(parents=True, exist_ok=True)
-        self.faiss_index_dir.mkdir(parents=True, exist_ok=True)
+    google_api_key: str = Field(default="", alias="GOOGLE_API_KEY")
+    gemini_model: str = Field(default="gemini-2.5-flash", alias="GEMINI_MODEL")
+    embedding_model: str = Field(
+        default="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+        alias="EMBEDDING_MODEL",
+    )
+
+    data_dir: Path = Field(default=Path("data"), alias="DATA_DIR")
+    sqlite_db_path: Path = Field(default=Path("data/civic_rag.db"), alias="SQLITE_DB_PATH")
+    faiss_index_dir: Path = Field(default=Path("data/faiss_index"), alias="FAISS_INDEX_DIR")
+    upload_dir: Path = Field(default=Path("data/uploads"), alias="UPLOAD_DIR")
+
+    chunk_size: int = Field(default=800, alias="CHUNK_SIZE")
+    chunk_overlap: int = Field(default=150, alias="CHUNK_OVERLAP")
+    top_k_retrieval: int = Field(default=5, alias="TOP_K_RETRIEVAL")
+    max_upload_mb: int = Field(default=50, alias="MAX_UPLOAD_MB")
+    log_level: str = Field(default="INFO", alias="LOG_LEVEL")
 
 
 settings = Settings()
+
+
+@lru_cache(maxsize=1)
+def get_settings() -> Settings:
+    """Return the cached application settings instance."""
+    return Settings()
