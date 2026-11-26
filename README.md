@@ -1,10 +1,10 @@
-# 🏛️ Multilingual Civic Scheme & Document Assistant
+#  Multilingual Civic Scheme & Document Assistant
 
 A citation-grounded Retrieval-Augmented Generation (RAG) system built to help citizens and caseworkers query government welfare schemes, eligibility rules, benefit schedules, and official circulars across **English, Hindi, Telugu, Tamil, Kannada, Marathi, and Bengali**.
 
 ---
 
-## ✨ Key Features
+##  Key Features
 
 - **Hybrid Semantic + Lexical Retrieval (RRF):** Combines dense multilingual embeddings (`sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2` via FAISS) with sparse exact-match scoring (`BM25Plus` via `rank_bm25`) fused through **Reciprocal Rank Fusion (RRF)**—preserving exact scheme codes, acreage figures, dates, and monetary thresholds alongside cross-lingual semantic intent.
 - **Table-Aware PDF Ingestion & Deduplication:** Extracts page-level text and structured Markdown tables using `PyMuPDF` and `pdfplumber`, chunks with source/page provenance metadata, and prevents duplicate indexing via **SHA-256** file hashing backed by **SQLite**.
@@ -14,7 +14,7 @@ A citation-grounded Retrieval-Augmented Generation (RAG) system built to help ci
 
 ---
 
-## 🏗️ Project Architecture
+##  Project Architecture
 
 ```text
 civic_rag_assistant/
