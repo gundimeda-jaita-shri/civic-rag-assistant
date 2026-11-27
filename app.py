@@ -26,8 +26,8 @@ UI_STRINGS = {
         "display_settings": "DISPLAY SETTINGS",
         "light_theme": "Light Theme (Default)",
         "dark_theme": "Dark Theme",
-        "doc_registry": "CIVIC DOCUMENT REGISTRY",
-        "upload_label": "Upload Official Scheme PDFs",
+        "doc_registry": "STEP 1: UPLOAD & INDEX OFFICIAL SCHEME DOCUMENTS (PDF)",
+        "upload_label": "Select or Drag and Drop Official Scheme PDF Files",
         "index_btn": "INDEX UPLOADED DOCUMENTS",
         "query_controls": "QUERY CONTROLS",
         "resp_lang": "Response Language",
@@ -35,7 +35,7 @@ UI_STRINGS = {
         "all_docs": "All Indexed Documents",
         "tab_ask": "ASK AND VERIFY",
         "tab_audit": "QUERY AUDIT LOG",
-        "prompt_label": "Enter your question about eligibility, benefits, required documents, or deadlines:",
+        "prompt_label": "STEP 2: ENTER YOUR QUESTION ABOUT ELIGIBILITY, BENEFITS, REQUIRED DOCUMENTS, OR DEADLINES:",
         "placeholder": "e.g., What is the annual financial assistance provided under the scheme, and what are the eligibility criteria?",
         "gen_btn": "GENERATE VERIFIED ANSWER",
         "verified_resp": "VERIFIED RESPONSE",
@@ -49,8 +49,8 @@ UI_STRINGS = {
         "display_settings": "प्रदर्शन सेटिंग्स",
         "light_theme": "लाइट थीम (डिफ़ॉल्ट)",
         "dark_theme": "डार्क थीम",
-        "doc_registry": "नागरिक दस्तावेज़ रजिस्ट्री",
-        "upload_label": "आधिकारिक योजना PDF अपलोड करें",
+        "doc_registry": "चरण 1: आधिकारिक योजना दस्तावेज़ (PDF) अपलोड और इंडेक्स करें",
+        "upload_label": "आधिकारिक योजना PDF फ़ाइलें चुनें या यहाँ खींचें",
         "index_btn": "अपलोड किए गए दस्तावेज़ इंडेक्स करें",
         "query_controls": "प्रश्न नियंत्रण",
         "resp_lang": "उत्तर की भाषा",
@@ -58,7 +58,7 @@ UI_STRINGS = {
         "all_docs": "सभी इंडेक्स किए गए दस्तावेज़",
         "tab_ask": "पूछें और सत्यापित करें",
         "tab_audit": "प्रश्न ऑडिट लॉग",
-        "prompt_label": "पात्रता, लाभ, आवश्यक दस्तावेज़ या अंतिम तिथि के बारे में अपना प्रश्न दर्ज करें:",
+        "prompt_label": "चरण 2: पात्रता, लाभ, आवश्यक दस्तावेज़ या अंतिम तिथि के बारे में अपना प्रश्न दर्ज करें:",
         "placeholder": "उदाहरण: योजना के अंतर्गत वार्षिक वित्तीय सहायता कितनी है और पात्रता मानदंड क्या हैं?",
         "gen_btn": "सत्यापित उत्तर प्राप्त करें",
         "verified_resp": "सत्यापित उत्तर",
@@ -72,8 +72,8 @@ UI_STRINGS = {
         "display_settings": "డిస్‌ప్లే సెట్టింగ్‌లు",
         "light_theme": "లైట్ థీమ్ (డిఫాల్ట్)",
         "dark_theme": "డార్క్ థీమ్",
-        "doc_registry": "పౌర పత్రాల రిజిస్ట్రీ",
-        "upload_label": "అధికారిక పథకం PDFలను అప్‌లోడ్ చేయండి",
+        "doc_registry": "దశ 1: అధికారిక పథకం పత్రాలను (PDF) అప్‌లోడ్ & ఇండెక్స్ చేయండి",
+        "upload_label": "అధికారిక పథకం PDF ఫైల్‌లను ఎంచుకోండి",
         "index_btn": "అప్‌లోడ్ చేసిన పత్రాలను ఇండెక్స్ చేయండి",
         "query_controls": "ప్రశ్న నియంత్రణలు",
         "resp_lang": "సమాధాన భాష",
@@ -81,7 +81,7 @@ UI_STRINGS = {
         "all_docs": "అన్ని ఇండెక్స్ చేసిన పత్రాలు",
         "tab_ask": "అడగండి మరియు ధృవీకరించండి",
         "tab_audit": "ప్రశ్నల ఆడిట్ లాగ్",
-        "prompt_label": "అర్హత, ప్రయోజనాలు, అవసరమైన పత్రాలు లేదా గడువు తేదీల గురించి మీ ప్రశ్నను నమోదు చేయండి:",
+        "prompt_label": "దశ 2: అర్హత, ప్రయోజనాలు, అవసరమైన పత్రాలు లేదా గడువు తేదీల గురించి మీ ప్రశ్నను నమోదు చేయండి:",
         "placeholder": "ఉదాహరణ: పథకం కింద అందించే వార్షిక ఆర్థిక సహాయం ఎంత మరియు అర్హత ప్రమాణాలు ఏమిటి?",
         "gen_btn": "ధృవీకరించబడిన సమాధానం పొందండి",
         "verified_resp": "ధృవీకరించబడిన సమాధానం",
@@ -95,8 +95,8 @@ UI_STRINGS = {
         "display_settings": "காட்சி அமைப்புகள்",
         "light_theme": "ஒளி தீம் (இயல்புநிலை)",
         "dark_theme": "இருண்ட தீம்",
-        "doc_registry": "குடிமக்கள் ஆவணப் பதிவேடு",
-        "upload_label": "அதிகாரப்பூர்வ திட்ட PDFகளை பதிவேற்றவும்",
+        "doc_registry": "படி 1: அதிகாரப்பூர்வ திட்ட ஆவணங்களை (PDF) பதிவேற்றி அட்டவணைப்படுத்தவும்",
+        "upload_label": "அதிகாரப்பூர்வ திட்ட PDF கோப்புகளைத் தேர்ந்தெடுக்கவும்",
         "index_btn": "பதிவேற்றிய ஆவணங்களை அட்டவணைப்படுத்து",
         "query_controls": "கேள்வி கட்டுப்பாடுகள்",
         "resp_lang": "பதில் மொழி",
@@ -104,7 +104,7 @@ UI_STRINGS = {
         "all_docs": "அனைத்து ஆவணங்களும்",
         "tab_ask": "கேட்டு சரிபார்க்கவும்",
         "tab_audit": "கேள்வி தணிக்கை பதிவு",
-        "prompt_label": "தகுதி, சலுகைகள், தேவையான ஆவணங்கள் அல்லது காலக்கெடு பற்றிய உங்கள் கேள்வியை உள்ளிடவும்:",
+        "prompt_label": "படி 2: தகுதி, சலுகைகள், தேவையான ஆவணங்கள் அல்லது காலக்கெடு பற்றிய உங்கள் கேள்வியை உள்ளிடவும்:",
         "placeholder": "எ.கா., திட்டத்தின் கீழ் வழங்கப்படும் ஆண்டு நிதியுதவி என்ன மற்றும் தகுதி வரம்புகள் யாவை?",
         "gen_btn": "சரிபார்க்கப்பட்ட பதிலைப் பெறுக",
         "verified_resp": "சரிபார்க்கப்பட்ட பதில்",
@@ -118,8 +118,8 @@ UI_STRINGS = {
         "display_settings": "प्रदर्शन सेटिंग्ज",
         "light_theme": "लाइट थीम (डीफॉल्ट)",
         "dark_theme": "डार्क थीम",
-        "doc_registry": "नागरी दस्तऐवज नोंदणी",
-        "upload_label": "अधिकृत योजना PDF अपलोड करा",
+        "doc_registry": "पायरी 1: अधिकृत योजना दस्तऐवज (PDF) अपलोड आणि इंडेक्स करा",
+        "upload_label": "अधिकृत योजना PDF फायली निवडा",
         "index_btn": "अपलोड केलेले दस्तऐवज इंडेक्स करा",
         "query_controls": "प्रश्न नियंत्रणे",
         "resp_lang": "उत्तराची भाषा",
@@ -127,7 +127,7 @@ UI_STRINGS = {
         "all_docs": "सर्व इंडेक्स केलेले दस्तऐवज",
         "tab_ask": "विचारा आणि पडताळणी करा",
         "tab_audit": "प्रश्न ऑडिट लॉग",
-        "prompt_label": "पात्रता, लाभ, आवश्यक कागदपत्रे किंवा अंतिम मुदतीबद्दल तुमचा प्रश्न प्रविष्ट करा:",
+        "prompt_label": "पायरी 2: पात्रता, लाभ, आवश्यक कागदपत्रे किंवा अंतिम मुदतीबद्दल तुमचा प्रश्न प्रविष्ट करा:",
         "placeholder": "उदा., योजनेअंतर्गत वार्षिक आर्थिक मदत किती आहे आणि पात्रता निकष काय आहेत?",
         "gen_btn": "पडताळलेले उत्तर मिळवा",
         "verified_resp": "पडताळलेले उत्तर",
@@ -141,8 +141,8 @@ UI_STRINGS = {
         "display_settings": "ডিসপ্লে সেটিংস",
         "light_theme": "লাইট থিম (ডিফল্ট)",
         "dark_theme": "ডার্ক থিম",
-        "doc_registry": "নাগরিক নথি নিবন্ধন",
-        "upload_label": "সরকারি প্রকল্পের PDF আপলোড করুন",
+        "doc_registry": "ধাপ ১: সরকারি প্রকল্পের নথি (PDF) আপলোড ও ইনডেক্স করুন",
+        "upload_label": "সরকারি প্রকল্পের PDF ফাইল নির্বাচন করুন",
         "index_btn": "আপলোড করা নথি ইনডেক্স করুন",
         "query_controls": "প্রশ্ন নিয়ন্ত্রণ",
         "resp_lang": "উত্তরের ভাষা",
@@ -150,7 +150,7 @@ UI_STRINGS = {
         "all_docs": "সমস্ত ইনডেক্স করা নথি",
         "tab_ask": "জিজ্ঞাসা ও যাচাই করুন",
         "tab_audit": "প্রশ্ন অডিট লগ",
-        "prompt_label": "যোগ্যতা, সুবিধা, প্রয়োজনীয় নথি বা সময়সীমা সম্পর্কে আপনার প্রশ্ন লিখুন:",
+        "prompt_label": "ধাপ ২: যোগ্যতা, সুবিধা, প্রয়োজনীয় নথি বা সময়সীমা সম্পর্কে আপনার প্রশ্ন লিখুন:",
         "placeholder": "যেমন: প্রকল্পের অধীনে বার্ষিক আর্থিক সহায়তা কত এবং যোগ্যতার মানদণ্ড কী?",
         "gen_btn": "যাচাইকৃত উত্তর তৈরি করুন",
         "verified_resp": "যাচাইকৃত উত্তর",
@@ -171,7 +171,6 @@ def detect_mime_type(raw_bytes: bytes, filename: str) -> str:
     if b"<svg" in raw_bytes[:512].lower() or filename.lower().endswith(".svg"):
         return "image/svg+xml"
     return "image/png"
-
 
 @st.cache_data
 def get_permanent_emblem_src() -> str:
@@ -232,7 +231,7 @@ def load_embedder():
 
 embedder = load_embedder()
 
-# 5. Sidebar Controls
+# 5. Sidebar Controls (Language, Scope & Theme)
 with st.sidebar:
     st.markdown(f"### **{t['query_controls']}**")
     st.selectbox(
@@ -254,51 +253,6 @@ with st.sidebar:
         index=0,
         label_visibility="collapsed"
     )
-    st.markdown("---")
-
-    st.markdown(f"### **{t['doc_registry']}**")
-    uploaded_files = st.file_uploader(
-        t["upload_label"],
-        type=["pdf"],
-        accept_multiple_files=True
-    )
-
-    if uploaded_files:
-        if st.button(t["index_btn"], use_container_width=True):
-            with st.spinner("Processing and indexing official documents..."):
-                splitter = RecursiveCharacterTextSplitter(chunk_size=800, chunk_overlap=150)
-                all_chunks = []
-                doc_list = []
-
-                for pdf_file in uploaded_files:
-                    doc_list.append(pdf_file.name)
-                    doc = fitz.open(stream=pdf_file.read(), filetype="pdf")
-                    for page_num in range(len(doc)):
-                        text = doc[page_num].get_text("text").strip()
-                        if text:
-                            splits = splitter.split_text(text)
-                            for s in splits:
-                                all_chunks.append({
-                                    "text": s,
-                                    "source": pdf_file.name,
-                                    "page": page_num + 1
-                                })
-
-                if all_chunks:
-                    texts = [c["text"] for c in all_chunks]
-                    embeddings = embedder.encode(texts, convert_to_numpy=True)
-                    faiss.normalize_L2(embeddings)
-                    index = faiss.IndexFlatIP(embeddings.shape[1])
-                    index.add(embeddings)
-
-                    tokenized_corpus = [txt.lower().split() for txt in texts]
-                    bm25 = BM25Okapi(tokenized_corpus)
-
-                    st.session_state.indexed_chunks = all_chunks
-                    st.session_state.faiss_index = index
-                    st.session_state.bm25_index = bm25
-                    st.session_state.doc_names = doc_list
-                    st.success(f"Indexed {len(all_chunks)} sections across {len(doc_list)} document(s).")
 
 # 6. Dynamic Formal Government Color Palette
 is_dark = (theme_choice == t["dark_theme"])
@@ -308,7 +262,7 @@ if is_dark:
     bg_sidebar = "#1E293B"
     bg_card = "#1E293B"
     text_main = "#F8FAFC"
-    border_col = "#334155"
+    border_col = "#475569"
     header_bg = "#1E293B"
     navy_accent = "#3B82F6"
     saffron_accent = "#D97706"
@@ -318,7 +272,7 @@ else:
     bg_sidebar = "#F3F4F6"
     bg_card = "#F8FAFC"
     text_main = "#111827"
-    border_col = "#CBD5E1"
+    border_col = "#94A3B8"
     header_bg = "#F8FAFC"
     navy_accent = "#1B365D"
     saffron_accent = "#D97706"
@@ -326,7 +280,7 @@ else:
 
 emblem_src = get_permanent_emblem_src()
 
-# 7. Inject Formal CSS & Permanent Central Government Header (Subtitle Removed)
+# 7. Inject Formal CSS (Including High-Visibility File Uploader Styling)
 st.markdown(f"""
 <style>
     .stApp, [data-testid="stHeader"] {{
@@ -352,6 +306,23 @@ st.markdown(f"""
         border: 1px solid {border_col} !important;
         border-radius: 4px !important;
         font-weight: 500 !important;
+    }}
+    /* Make the File Uploader Dropzone & Browse Button Clearly Visible */
+    [data-testid="stFileUploader"] section {{
+        background-color: {bg_card} !important;
+        border: 2px dashed {navy_accent} !important;
+        border-radius: 6px !important;
+        padding: 16px !important;
+    }}
+    [data-testid="stFileUploader"] button {{
+        background-color: {btn_bg} !important;
+        color: #FFFFFF !important;
+        font-weight: 700 !important;
+        border: 1px solid {navy_accent} !important;
+        border-radius: 4px !important;
+    }}
+    [data-testid="stFileUploader"] small, [data-testid="stFileUploader"] span {{
+        color: {text_main} !important;
     }}
     .stButton > button {{
         background-color: {btn_bg} !important;
@@ -421,7 +392,7 @@ st.markdown(f"""
 def retrieve_and_answer(query: str, lang: str, scope: str, all_docs_label: str):
     chunks = st.session_state.indexed_chunks
     if not chunks:
-        return "No indexed documents found. Please upload and index official scheme PDFs in the left sidebar first.", []
+        return "No indexed documents found. Please upload and index official scheme PDFs in Step 1 above first.", []
 
     valid_indices = [
         i for i, c in enumerate(chunks)
@@ -430,17 +401,14 @@ def retrieve_and_answer(query: str, lang: str, scope: str, all_docs_label: str):
     if not valid_indices:
         return "No sections match the selected document scope.", []
 
-    # Dense Retrieval (FAISS)
     q_emb = embedder.encode([query], convert_to_numpy=True)
     faiss.normalize_L2(q_emb)
     scores, indices = st.session_state.faiss_index.search(q_emb, k=min(10, len(chunks)))
     dense_hits = {int(idx): float(sc) for idx, sc in zip(indices[0], scores[0]) if int(idx) in valid_indices}
 
-    # Sparse Retrieval (BM25)
     bm25_scores = st.session_state.bm25_index.get_scores(query.lower().split())
     max_bm25 = max(bm25_scores) if max(bm25_scores) > 0 else 1.0
 
-    # Combine Hybrid Scores
     combined = []
     for idx in valid_indices:
         d_score = dense_hits.get(idx, 0.0)
@@ -491,7 +459,56 @@ CITIZEN QUESTION:
     except Exception as e:
         return f"Gemini API Error: {str(e)}", top_chunks
 
-# 9. Formal Tabs (Localized, No Emojis, Bold Uppercase)
+# 9. Main-Screen Document Upload Box + Formal Tabs
+with st.container(border=True):
+    st.markdown(f"**{t['doc_registry']}**")
+    uploaded_files = st.file_uploader(
+        t["upload_label"],
+        type=["pdf"],
+        accept_multiple_files=True,
+        key="main_pdf_uploader"
+    )
+
+    if uploaded_files:
+        if st.button(t["index_btn"]):
+            with st.spinner("Processing and indexing official documents..."):
+                splitter = RecursiveCharacterTextSplitter(chunk_size=800, chunk_overlap=150)
+                all_chunks = []
+                doc_list = []
+
+                for pdf_file in uploaded_files:
+                    doc_list.append(pdf_file.name)
+                    doc = fitz.open(stream=pdf_file.read(), filetype="pdf")
+                    for page_num in range(len(doc)):
+                        text = doc[page_num].get_text("text").strip()
+                        if text:
+                            splits = splitter.split_text(text)
+                            for s in splits:
+                                all_chunks.append({
+                                    "text": s,
+                                    "source": pdf_file.name,
+                                    "page": page_num + 1
+                                })
+
+                if all_chunks:
+                    texts = [c["text"] for c in all_chunks]
+                    embeddings = embedder.encode(texts, convert_to_numpy=True)
+                    faiss.normalize_L2(embeddings)
+                    index = faiss.IndexFlatIP(embeddings.shape[1])
+                    index.add(embeddings)
+
+                    tokenized_corpus = [txt.lower().split() for txt in texts]
+                    bm25 = BM25Okapi(tokenized_corpus)
+
+                    st.session_state.indexed_chunks = all_chunks
+                    st.session_state.faiss_index = index
+                    st.session_state.bm25_index = bm25
+                    st.session_state.doc_names = doc_list
+                    st.success(f"Indexed {len(all_chunks)} sections across {len(doc_list)} document(s): {', '.join(doc_list)}")
+
+    if st.session_state.doc_names:
+        st.caption(f"Active Indexed Documents: {', '.join(st.session_state.doc_names)}")
+
 tab_ask, tab_audit = st.tabs([t["tab_ask"], t["tab_audit"]])
 
 with tab_ask:
