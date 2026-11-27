@@ -1,7 +1,3 @@
 [theme]
 base = "light"
-primaryColor = "#1B365D"          # Classic Government Navy Blue
-backgroundColor = "#FFFFFF"       # Clean White Background
-secondaryBackgroundColor = "#F3F4F6" # Soft Light Gray Sidebar
-textColor = "#111827"             # High-Contrast Charcoal Black
-font = "sans serif"
+primaryColor = "#1B365D"
