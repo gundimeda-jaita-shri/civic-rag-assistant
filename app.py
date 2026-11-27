@@ -207,20 +207,26 @@ def get_gemini_api_key() -> str:
             api_key = ""
     return api_key
 
-# 3. Sub-Second Batch Cloud Embeddings via Gemini API
+@st.cache_resource
+def get_genai_client(api_key: str):
+    from google import genai
+    return genai.Client(api_key=api_key)
+
+# 3. Sub-Second Batch Cloud Embeddings via Active gemini-embedding-001
 def compute_embeddings_batch(texts: list[str], api_key: str) -> np.ndarray | None:
     if not api_key or not texts:
         return None
     try:
-        from google import genai
-        client = genai.Client(api_key=api_key)
+        from google.genai import types
+        client = get_genai_client(api_key)
         all_vecs = []
         batch_size = 100
         for i in range(0, len(texts), batch_size):
             batch = texts[i:i + batch_size]
             res = client.models.embed_content(
-                model="text-embedding-004",
-                contents=batch
+                model="gemini-embedding-001",
+                contents=batch,
+                config=types.EmbedContentConfig(output_dimensionality=768)
             )
             for emb in res.embeddings:
                 all_vecs.append(emb.values)
@@ -417,7 +423,7 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-# 9. Hybrid Retrieval & Gemini 4 Hydrogen Answer Generation
+# 9. Fast Hybrid Retrieval & Low-Latency Answer Generation
 def retrieve_and_answer(query: str, lang: str, scope: str, all_docs_label: str):
     chunks = st.session_state.indexed_chunks
     if not chunks:
@@ -432,7 +438,7 @@ def retrieve_and_answer(query: str, lang: str, scope: str, all_docs_label: str):
 
     api_key = get_gemini_api_key()
     if not api_key:
-        return "API key missing. Set GEMINI_API_KEY in your .env file or Streamlit secrets.", []
+        return "Service configuration is currently being updated. Please try again shortly.", []
 
     # Dense Retrieval via Fast Numpy Dot Product
     dense_hits = {}
@@ -474,17 +480,16 @@ CITIZEN QUESTION:
 {query}
 """
     try:
-        from google import genai
-
-        client = genai.Client(api_key=api_key)
+        client = get_genai_client(api_key)
         interaction = client.interactions.create(
             model="gemini-4-hydrogen",
             input=prompt,
+            generation_config={"thinking_level": "low"},
             store=False
         )
-        return interaction.output_text or "Model returned an empty response.", top_chunks
-    except Exception as e:
-        return f"Gemini API Error: {str(e)}", top_chunks
+        return interaction.output_text or "Unable to verify the response at this moment.", top_chunks
+    except Exception:
+        return "Unable to verify the response at this moment. Please try again shortly.", top_chunks
 
 # 10. Main-Screen Document Upload Box (Indexes in ~1–2 Seconds)
 with st.container(border=True):
