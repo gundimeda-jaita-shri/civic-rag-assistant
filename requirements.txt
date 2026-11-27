@@ -15,3 +15,14 @@ python-dotenv>=1.0.1
 pillow>=10.4.0
 pytest>=8.3.0
 ruff>=0.6.0
+streamlit
+pymupdf
+numpy
+rank-bm25
+google-genai
+streamlit
+pymupdf
+numpy
+rank-bm25
+python-dotenv
+google-genai>=2.34.0

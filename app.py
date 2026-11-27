@@ -2,9 +2,14 @@ import os
 import glob
 import base64
 from datetime import datetime
+from dotenv import load_dotenv
 import streamlit as st
+import numpy as np
 
-# 1. Page Configuration (Executes Immediately)
+# Load GEMINI_API_KEY from local .env file if present
+load_dotenv()
+
+# 1. Page Configuration
 st.set_page_config(
     page_title="Multilingual Civic Scheme & Document Assistant",
     layout="wide",
@@ -152,7 +157,7 @@ UI_STRINGS = {
     }
 }
 
-# 2. Permanent Local Emblem Loader (Cached in Memory)
+# 2. Permanent Local Emblem Loader
 def detect_mime_type(raw_bytes: bytes, filename: str) -> str:
     if raw_bytes.startswith(b"\x89PNG\r\n\x1a\n"):
         return "image/png"
@@ -193,17 +198,57 @@ def get_permanent_emblem_src() -> str:
     """.strip()
     return f"data:image/svg+xml;base64,{base64.b64encode(fallback_svg.encode('utf-8')).decode('utf-8')}"
 
-# 3. Lazy-Loaded Embedding Model (Only Loads When Indexing/Querying, NOT on Page Open)
-@st.cache_resource(show_spinner="Initializing multilingual semantic retrieval engine...")
-def get_embedder():
-    from sentence_transformers import SentenceTransformer
-    return SentenceTransformer("sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
+def get_gemini_api_key() -> str:
+    api_key = os.environ.get("GEMINI_API_KEY", "")
+    if not api_key:
+        try:
+            api_key = st.secrets.get("GEMINI_API_KEY", "")
+        except Exception:
+            api_key = ""
+    return api_key
 
-# 4. Initialize Session State
+# 3. Sub-Second Batch Cloud Embeddings via Gemini API
+def compute_embeddings_batch(texts: list[str], api_key: str) -> np.ndarray | None:
+    if not api_key or not texts:
+        return None
+    try:
+        from google import genai
+        client = genai.Client(api_key=api_key)
+        all_vecs = []
+        batch_size = 100
+        for i in range(0, len(texts), batch_size):
+            batch = texts[i:i + batch_size]
+            res = client.models.embed_content(
+                model="text-embedding-004",
+                contents=batch
+            )
+            for emb in res.embeddings:
+                all_vecs.append(emb.values)
+        arr = np.array(all_vecs, dtype="float32")
+        norms = np.linalg.norm(arr, axis=1, keepdims=True)
+        norms[norms == 0] = 1.0
+        return arr / norms
+    except Exception:
+        return None
+
+# 4. Fast Pure-Python Chunker
+def fast_chunk_text(text: str, chunk_size: int = 900, overlap: int = 150) -> list[str]:
+    chunks = []
+    start = 0
+    length = len(text)
+    while start < length:
+        end = min(start + chunk_size, length)
+        chunks.append(text[start:end])
+        if end == length:
+            break
+        start += (chunk_size - overlap)
+    return chunks
+
+# 5. Initialize Session State
 if "indexed_chunks" not in st.session_state:
     st.session_state.indexed_chunks = []
-if "faiss_index" not in st.session_state:
-    st.session_state.faiss_index = None
+if "doc_embeddings" not in st.session_state:
+    st.session_state.doc_embeddings = None
 if "bm25_index" not in st.session_state:
     st.session_state.bm25_index = None
 if "doc_names" not in st.session_state:
@@ -216,7 +261,7 @@ if "lang_select" not in st.session_state:
 response_lang = st.session_state.lang_select
 t = UI_STRINGS.get(response_lang, UI_STRINGS["English"])
 
-# 5. Sidebar Controls (Renders Immediately)
+# 6. Sidebar Controls
 with st.sidebar:
     st.markdown(f"### **{t['query_controls']}**")
     st.selectbox(
@@ -239,7 +284,7 @@ with st.sidebar:
         label_visibility="collapsed"
     )
 
-# 6. Dynamic Formal Government Color Palette
+# 7. Dynamic Formal Government Color Palette
 is_dark = (theme_choice == t["dark_theme"])
 
 if is_dark:
@@ -265,7 +310,7 @@ else:
 
 emblem_src = get_permanent_emblem_src()
 
-# 7. Inject Formal CSS & Permanent Central Government Header
+# 8. Inject Formal CSS & Permanent Central Government Header
 st.markdown(f"""
 <style>
     .stApp, [data-testid="stHeader"] {{
@@ -372,7 +417,7 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-# 8. Hybrid Retrieval & Gemini Answer Generation Function (Lazy Imports Inside)
+# 9. Hybrid Retrieval & Gemini 4 Hydrogen Answer Generation
 def retrieve_and_answer(query: str, lang: str, scope: str, all_docs_label: str):
     chunks = st.session_state.indexed_chunks
     if not chunks:
@@ -385,16 +430,20 @@ def retrieve_and_answer(query: str, lang: str, scope: str, all_docs_label: str):
     if not valid_indices:
         return "No sections match the selected document scope.", []
 
-    import faiss
-    from google import genai
-    from google.genai import types
+    api_key = get_gemini_api_key()
+    if not api_key:
+        return "API key missing. Set GEMINI_API_KEY in your .env file or Streamlit secrets.", []
 
-    embedder = get_embedder()
-    q_emb = embedder.encode([query], convert_to_numpy=True)
-    faiss.normalize_L2(q_emb)
-    scores, indices = st.session_state.faiss_index.search(q_emb, k=min(10, len(chunks)))
-    dense_hits = {int(idx): float(sc) for idx, sc in zip(indices[0], scores[0]) if int(idx) in valid_indices}
+    # Dense Retrieval via Fast Numpy Dot Product
+    dense_hits = {}
+    doc_emb = st.session_state.doc_embeddings
+    if doc_emb is not None:
+        q_emb = compute_embeddings_batch([query], api_key)
+        if q_emb is not None:
+            sims = np.dot(doc_emb, q_emb[0])
+            dense_hits = {idx: float(sims[idx]) for idx in valid_indices}
 
+    # Sparse Retrieval (BM25)
     bm25_scores = st.session_state.bm25_index.get_scores(query.lower().split())
     max_bm25 = max(bm25_scores) if max(bm25_scores) > 0 else 1.0
 
@@ -402,7 +451,7 @@ def retrieve_and_answer(query: str, lang: str, scope: str, all_docs_label: str):
     for idx in valid_indices:
         d_score = dense_hits.get(idx, 0.0)
         s_score = float(bm25_scores[idx]) / max_bm25
-        hybrid_score = (0.65 * d_score) + (0.35 * s_score)
+        hybrid_score = (0.65 * d_score + 0.35 * s_score) if dense_hits else s_score
         combined.append((hybrid_score, chunks[idx]))
 
     combined.sort(key=lambda x: x[0], reverse=True)
@@ -424,31 +473,20 @@ VERIFIED EXCERPTS:
 CITIZEN QUESTION:
 {query}
 """
-    api_key = os.environ.get("GEMINI_API_KEY", "")
-    if not api_key:
-        try:
-            api_key = st.secrets.get("GEMINI_API_KEY", "")
-        except Exception:
-            api_key = ""
-
-    if not api_key:
-        return "API key missing. Set GEMINI_API_KEY in environment variables or Streamlit secrets.", top_chunks
-
     try:
+        from google import genai
+
         client = genai.Client(api_key=api_key)
-        response = client.models.generate_content(
-            model="gemini-2.5-flash",
-            contents=prompt,
-            config=types.GenerateContentConfig(
-                temperature=0.1,
-                max_output_tokens=900,
-            ),
+        interaction = client.interactions.create(
+            model="gemini-4-hydrogen",
+            input=prompt,
+            store=False
         )
-        return response.text or "Model returned an empty response.", top_chunks
+        return interaction.output_text or "Model returned an empty response.", top_chunks
     except Exception as e:
         return f"Gemini API Error: {str(e)}", top_chunks
 
-# 9. Main-Screen Document Upload Box + Formal Tabs
+# 10. Main-Screen Document Upload Box (Indexes in ~1–2 Seconds)
 with st.container(border=True):
     st.markdown(f"**{t['doc_registry']}**")
     uploaded_files = st.file_uploader(
@@ -460,14 +498,10 @@ with st.container(border=True):
 
     if uploaded_files:
         if st.button(t["index_btn"]):
-            with st.spinner("Processing and indexing official documents..."):
+            with st.spinner("Indexing document..."):
                 import fitz
-                import faiss
                 from rank_bm25 import BM25Okapi
-                from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-                embedder = get_embedder()
-                splitter = RecursiveCharacterTextSplitter(chunk_size=800, chunk_overlap=150)
                 all_chunks = []
                 doc_list = []
 
@@ -477,8 +511,7 @@ with st.container(border=True):
                     for page_num in range(len(doc)):
                         text = doc[page_num].get_text("text").strip()
                         if text:
-                            splits = splitter.split_text(text)
-                            for s in splits:
+                            for s in fast_chunk_text(text):
                                 all_chunks.append({
                                     "text": s,
                                     "source": pdf_file.name,
@@ -487,16 +520,14 @@ with st.container(border=True):
 
                 if all_chunks:
                     texts = [c["text"] for c in all_chunks]
-                    embeddings = embedder.encode(texts, convert_to_numpy=True)
-                    faiss.normalize_L2(embeddings)
-                    index = faiss.IndexFlatIP(embeddings.shape[1])
-                    index.add(embeddings)
+                    api_key = get_gemini_api_key()
+                    embeddings = compute_embeddings_batch(texts, api_key)
 
                     tokenized_corpus = [txt.lower().split() for txt in texts]
                     bm25 = BM25Okapi(tokenized_corpus)
 
                     st.session_state.indexed_chunks = all_chunks
-                    st.session_state.faiss_index = index
+                    st.session_state.doc_embeddings = embeddings
                     st.session_state.bm25_index = bm25
                     st.session_state.doc_names = doc_list
                     st.success(f"Indexed {len(all_chunks)} sections across {len(doc_list)} document(s): {', '.join(doc_list)}")
