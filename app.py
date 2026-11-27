@@ -3,16 +3,8 @@ import glob
 import base64
 from datetime import datetime
 import streamlit as st
-import fitz  # PyMuPDF
-import numpy as np
-import faiss
-from rank_bm25 import BM25Okapi
-from sentence_transformers import SentenceTransformer
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-from google import genai
-from google.genai import types
 
-# 1. Page Configuration
+# 1. Page Configuration (Executes Immediately)
 st.set_page_config(
     page_title="Multilingual Civic Scheme & Document Assistant",
     layout="wide",
@@ -160,7 +152,7 @@ UI_STRINGS = {
     }
 }
 
-# 2. Permanent Local Emblem Loader (Supports .in_, .in_*, .png, .jpg, .webp, .svg)
+# 2. Permanent Local Emblem Loader (Cached in Memory)
 def detect_mime_type(raw_bytes: bytes, filename: str) -> str:
     if raw_bytes.startswith(b"\x89PNG\r\n\x1a\n"):
         return "image/png"
@@ -181,13 +173,9 @@ def get_permanent_emblem_src() -> str:
         os.path.join(base_dir, "central_govt*"),
         os.path.join(base_dir, "india_emblem*"),
         os.path.join(base_dir, "emblem*"),
-        os.path.join(base_dir, "assets", "*.in_*"),
-        os.path.join(base_dir, "assets", "india_emblem*"),
     ]
-
     for pattern in search_patterns:
-        matches = sorted(glob.glob(pattern))
-        for file_path in matches:
+        for file_path in sorted(glob.glob(pattern)):
             if os.path.isfile(file_path):
                 with open(file_path, "rb") as img_file:
                     raw_bytes = img_file.read()
@@ -200,14 +188,18 @@ def get_permanent_emblem_src() -> str:
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
         <rect width="120" height="120" rx="8" fill="#FFFFFF"/>
         <circle cx="60" cy="60" r="46" fill="none" stroke="#1B365D" stroke-width="5"/>
-        <circle cx="60" cy="60" r="10" fill="#1B365D"/>
-        <text x="60" y="102" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#1B365D" text-anchor="middle">GOVT OF INDIA</text>
+        <text x="60" y="65" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#1B365D" text-anchor="middle">GOVT OF INDIA</text>
     </svg>
     """.strip()
-    b64_svg = base64.b64encode(fallback_svg.encode("utf-8")).decode("utf-8")
-    return f"data:image/svg+xml;base64,{b64_svg}"
+    return f"data:image/svg+xml;base64,{base64.b64encode(fallback_svg.encode('utf-8')).decode('utf-8')}"
 
-# 3. Initialize Session State
+# 3. Lazy-Loaded Embedding Model (Only Loads When Indexing/Querying, NOT on Page Open)
+@st.cache_resource(show_spinner="Initializing multilingual semantic retrieval engine...")
+def get_embedder():
+    from sentence_transformers import SentenceTransformer
+    return SentenceTransformer("sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
+
+# 4. Initialize Session State
 if "indexed_chunks" not in st.session_state:
     st.session_state.indexed_chunks = []
 if "faiss_index" not in st.session_state:
@@ -224,14 +216,7 @@ if "lang_select" not in st.session_state:
 response_lang = st.session_state.lang_select
 t = UI_STRINGS.get(response_lang, UI_STRINGS["English"])
 
-# 4. Load Multilingual Embedding Model (Cached)
-@st.cache_resource
-def load_embedder():
-    return SentenceTransformer("sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
-
-embedder = load_embedder()
-
-# 5. Sidebar Controls (Language, Scope & Theme)
+# 5. Sidebar Controls (Renders Immediately)
 with st.sidebar:
     st.markdown(f"### **{t['query_controls']}**")
     st.selectbox(
@@ -280,7 +265,7 @@ else:
 
 emblem_src = get_permanent_emblem_src()
 
-# 7. Inject Formal CSS (Including High-Visibility File Uploader Styling)
+# 7. Inject Formal CSS & Permanent Central Government Header
 st.markdown(f"""
 <style>
     .stApp, [data-testid="stHeader"] {{
@@ -307,7 +292,6 @@ st.markdown(f"""
         border-radius: 4px !important;
         font-weight: 500 !important;
     }}
-    /* Make the File Uploader Dropzone & Browse Button Clearly Visible */
     [data-testid="stFileUploader"] section {{
         background-color: {bg_card} !important;
         border: 2px dashed {navy_accent} !important;
@@ -388,7 +372,7 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-# 8. Hybrid Retrieval & Gemini Answer Generation Function
+# 8. Hybrid Retrieval & Gemini Answer Generation Function (Lazy Imports Inside)
 def retrieve_and_answer(query: str, lang: str, scope: str, all_docs_label: str):
     chunks = st.session_state.indexed_chunks
     if not chunks:
@@ -401,6 +385,11 @@ def retrieve_and_answer(query: str, lang: str, scope: str, all_docs_label: str):
     if not valid_indices:
         return "No sections match the selected document scope.", []
 
+    import faiss
+    from google import genai
+    from google.genai import types
+
+    embedder = get_embedder()
     q_emb = embedder.encode([query], convert_to_numpy=True)
     faiss.normalize_L2(q_emb)
     scores, indices = st.session_state.faiss_index.search(q_emb, k=min(10, len(chunks)))
@@ -472,6 +461,12 @@ with st.container(border=True):
     if uploaded_files:
         if st.button(t["index_btn"]):
             with st.spinner("Processing and indexing official documents..."):
+                import fitz
+                import faiss
+                from rank_bm25 import BM25Okapi
+                from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+                embedder = get_embedder()
                 splitter = RecursiveCharacterTextSplitter(chunk_size=800, chunk_overlap=150)
                 all_chunks = []
                 doc_list = []
